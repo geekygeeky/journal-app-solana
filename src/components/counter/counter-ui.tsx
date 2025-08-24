@@ -1,20 +1,58 @@
 'use client'
 
-import { Keypair, PublicKey } from '@solana/web3.js'
-import { useMemo } from 'react'
+import { PublicKey } from '@solana/web3.js'
+import { useState } from 'react'
 import { ExplorerLink } from '../cluster/cluster-ui'
 import { useCounterProgram, useCounterProgramAccount } from './counter-data-access'
 import { ellipsify } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
+import { useWallet } from '@solana/wallet-adapter-react'
+import { toast } from 'sonner'
 
 export function CounterCreate() {
-  const { initialize } = useCounterProgram()
+  const { createEntry } = useCounterProgram()
+
+  const [title, setTitle] = useState('')
+  const [message, setMessage] = useState('')
+  const { publicKey: owner } = useWallet()
+
+  const isFormValid = title.trim() !== '' && message.trim() !== ''
+
+  const handleSubmit = () => {
+    if (owner && isFormValid) {
+      createEntry.mutateAsync({ title, message, owner })
+    }
+  }
+
+  if (!owner) {
+    return (
+      <p>
+        Connect your wallet
+        <Button onClick={() => {}}>Connect</Button>
+      </p>
+    )
+  }
 
   return (
-    <Button onClick={() => initialize.mutateAsync(Keypair.generate())} disabled={initialize.isPending}>
-      Create {initialize.isPending && '...'}
-    </Button>
+    <div>
+      <input
+        type="text"
+        placeholder="Title"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        className="input input-bordered w-full max-w-xs"
+      />
+      <textarea
+        placeholder="message"
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        className="textarea textarea-bordered w-full max-w-xs"
+      />
+      <Button onClick={handleSubmit} disabled={createEntry.isPending || !isFormValid}>
+        Connect
+      </Button>
+    </div>
   )
 }
 
@@ -52,63 +90,57 @@ export function CounterList() {
 }
 
 function CounterCard({ account }: { account: PublicKey }) {
-  const { accountQuery, incrementMutation, setMutation, decrementMutation, closeMutation } = useCounterProgramAccount({
+  const { publicKey } = useWallet()
+  const { accountQuery, updateEntry, deleteEntry } = useCounterProgramAccount({
     account,
   })
 
-  const count = useMemo(() => accountQuery.data?.count ?? 0, [accountQuery.data?.count])
+  const [message, setMessage] = useState('')
+  const title = accountQuery.data?.title
+
+  const isFormValid = message.trim() !== ''
+
+  const handleSubmit = () => {
+    if (publicKey && isFormValid && title) {
+      updateEntry.mutateAsync({ title, message, owner: publicKey })
+    }
+  }
+
+  // if (owner) {
+  //   return (
+  //     <p>
+  //       Connect your wallet
+  //       <Button onClick={() => {}}>Connect</Button>
+  //     </p>
+  //   )
+  // }
 
   return accountQuery.isLoading ? (
     <span className="loading loading-spinner loading-lg"></span>
   ) : (
     <Card>
       <CardHeader>
-        <CardTitle>Counter: {count}</CardTitle>
+        <CardTitle>{accountQuery.data?.title}</CardTitle>
         <CardDescription>
           Account: <ExplorerLink path={`account/${account}`} label={ellipsify(account.toString())} />
         </CardDescription>
+        <CardAction>
+          <Button
+            onClick={() => {
+              const title = accountQuery.data?.title
+              if (!title) {
+                toast.error('Title is not available')
+                return
+              }
+              deleteEntry.mutateAsync(title)
+            }}
+            disabled={deleteEntry.isPending}
+          >Delete</Button>
+        </CardAction>
       </CardHeader>
       <CardContent>
         <div className="flex gap-4">
-          <Button
-            variant="outline"
-            onClick={() => incrementMutation.mutateAsync()}
-            disabled={incrementMutation.isPending}
-          >
-            Increment
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => {
-              const value = window.prompt('Set value to:', count.toString() ?? '0')
-              if (!value || parseInt(value) === count || isNaN(parseInt(value))) {
-                return
-              }
-              return setMutation.mutateAsync(parseInt(value))
-            }}
-            disabled={setMutation.isPending}
-          >
-            Set
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => decrementMutation.mutateAsync()}
-            disabled={decrementMutation.isPending}
-          >
-            Decrement
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={() => {
-              if (!window.confirm('Are you sure you want to close this account?')) {
-                return
-              }
-              return closeMutation.mutateAsync()
-            }}
-            disabled={closeMutation.isPending}
-          >
-            Close
-          </Button>
+          <p>{accountQuery.data?.message}</p>
         </div>
       </CardContent>
     </Card>
