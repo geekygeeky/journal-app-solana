@@ -1,4 +1,5 @@
 #![allow(clippy::result_large_err)]
+#![allow(unexpected_cfgs)]
 
 use anchor_lang::prelude::*;
 
@@ -25,7 +26,7 @@ pub mod journal_app {
         
     }
 
-    pub fn delete_journal_entry(_: Context<DeleteEntry>, _title: String) -> Result<()>{
+    pub fn delete_journal_entry(_ctx: Context<DeleteEntry>, _title: String) -> Result<()>{
         Ok(())
     }
 }
