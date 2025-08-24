@@ -1,9 +1,9 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "module": "commonjs",
-    "types": ["jest", "node"],
+    "module": "es2015",
     "typeRoots": ["./node_modules/@types"],
+    // "types": ["jest", "node"],
     "lib": ["es2015"],
     "target": "es6",
     "resolveJsonModule": true,
