@@ -2,7 +2,7 @@
 
 import { getCounterProgram, getCounterProgramId } from '@project/anchor'
 import { useConnection } from '@solana/wallet-adapter-react'
-import { Cluster, Keypair, PublicKey } from '@solana/web3.js'
+import { Cluster, PublicKey } from '@solana/web3.js'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { useCluster } from '../cluster/cluster-data-access'
@@ -11,6 +11,7 @@ import { useTransactionToast } from '../use-transaction-toast'
 import { toast } from 'sonner'
 
 interface JournalEntryArgs {
+  id: Buffer<ArrayBufferLike>;
   title: string;
   message: string;
   owner: PublicKey;
@@ -36,7 +37,7 @@ export function useCounterProgram() {
 
   const createEntry = useMutation<string, Error, JournalEntryArgs>({
     mutationKey: ['journalEntry', 'create', { cluster }],
-    mutationFn: ({ title, message }) => program.methods.createJournalEntry(title, message).rpc(),
+    mutationFn: ({ id, title, message }) => program.methods.createJournalEntry(id, title, message).rpc(),
     onSuccess: async (signature) => {
       transactionToast(signature)
       accounts.refetch()
@@ -68,7 +69,7 @@ export function useCounterProgramAccount({ account }: { account: PublicKey }) {
 
   const updateEntry = useMutation<string, Error, JournalEntryArgs>({
     mutationKey: ['journalEntry', 'update', { cluster }],
-    mutationFn: ({ title, message }) => program.methods.updateJournalEntry(title, message).rpc(),
+    mutationFn: ({ id, title, message }) => program.methods.updateJournalEntry(id, title, message).rpc(),
     onSuccess: async (signature) => {
       transactionToast(signature)
       accounts.refetch()
@@ -79,9 +80,9 @@ export function useCounterProgramAccount({ account }: { account: PublicKey }) {
   })
 
 
-  const deleteEntry = useMutation<string, Error, string>({
+  const deleteEntry = useMutation<string, Error, Buffer>({
     mutationKey: ['journalEntry', 'delete', { cluster }],
-    mutationFn: (title) => program.methods.deleteJournalEntry(title).rpc(),
+    mutationFn: (id) => program.methods.deleteJournalEntry(id).rpc(),
     onSuccess: async (signature) => {
       transactionToast(signature)
       accounts.refetch()

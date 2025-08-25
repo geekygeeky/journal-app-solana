@@ -1,10 +1,11 @@
 'use client'
 
-import { PublicKey } from '@solana/web3.js'
+import { Keypair, PublicKey } from '@solana/web3.js'
 import { useState } from 'react'
+import { stringify as uuidStringify, v4, parse } from 'uuid';
 import { ExplorerLink } from '../cluster/cluster-ui'
 import { useCounterProgram, useCounterProgramAccount } from './counter-data-access'
-import { ellipsify } from '@/lib/utils'
+import { ellipsify, generateUuidV4AsUint8Array, uuidToBuffer } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
 import { useWallet } from '@solana/wallet-adapter-react'
@@ -21,7 +22,8 @@ export function CounterCreate() {
 
   const handleSubmit = () => {
     if (owner && isFormValid) {
-      createEntry.mutateAsync({ title, message, owner })
+      const id = uuidToBuffer(v4());
+      createEntry.mutateAsync({ id, title, message, owner })
     }
   }
 
@@ -29,7 +31,7 @@ export function CounterCreate() {
     return (
       <p>
         Connect your wallet
-        <Button onClick={() => {}}>Connect</Button>
+        <Button onClick={() => { }}>Connect</Button>
       </p>
     )
   }
@@ -96,24 +98,15 @@ function CounterCard({ account }: { account: PublicKey }) {
   })
 
   const [message, setMessage] = useState('')
-  const title = accountQuery.data?.title
 
   const isFormValid = message.trim() !== ''
 
-  const handleSubmit = () => {
-    if (publicKey && isFormValid && title) {
-      updateEntry.mutateAsync({ title, message, owner: publicKey })
+  const handleUpdatee = () => {
+    if (publicKey && isFormValid && accountQuery.data) {
+      const { id, title } = accountQuery.data;
+      updateEntry.mutateAsync({ id, title, message, owner: publicKey })
     }
   }
-
-  // if (owner) {
-  //   return (
-  //     <p>
-  //       Connect your wallet
-  //       <Button onClick={() => {}}>Connect</Button>
-  //     </p>
-  //   )
-  // }
 
   return accountQuery.isLoading ? (
     <span className="loading loading-spinner loading-lg"></span>
@@ -127,12 +120,12 @@ function CounterCard({ account }: { account: PublicKey }) {
         <CardAction>
           <Button
             onClick={() => {
-              const title = accountQuery.data?.title
-              if (!title) {
-                toast.error('Title is not available')
+              const id = accountQuery.data?.id
+              if (!id) {
+                toast.error('ID is not available')
                 return
               }
-              deleteEntry.mutateAsync(title)
+              deleteEntry.mutateAsync(id)
             }}
             disabled={deleteEntry.isPending}
           >Delete</Button>
@@ -140,6 +133,7 @@ function CounterCard({ account }: { account: PublicKey }) {
       </CardHeader>
       <CardContent>
         <div className="flex gap-4">
+          <p>{accountQuery.data?.id}</p>
           <p>{accountQuery.data?.message}</p>
         </div>
       </CardContent>
