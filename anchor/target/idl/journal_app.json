@@ -27,7 +27,7 @@
             "seeds": [
               {
                 "kind": "arg",
-                "path": "title"
+                "path": "id"
               },
               {
                 "kind": "account",
@@ -47,6 +47,10 @@
         }
       ],
       "args": [
+        {
+          "name": "id",
+          "type": "bytes"
+        },
         {
           "name": "title",
           "type": "string"
@@ -77,7 +81,7 @@
             "seeds": [
               {
                 "kind": "arg",
-                "path": "title"
+                "path": "id"
               },
               {
                 "kind": "account",
@@ -98,8 +102,8 @@
       ],
       "args": [
         {
-          "name": "_title",
-          "type": "string"
+          "name": "_id",
+          "type": "bytes"
         }
       ]
     },
@@ -123,7 +127,7 @@
             "seeds": [
               {
                 "kind": "arg",
-                "path": "title"
+                "path": "id"
               },
               {
                 "kind": "account",
@@ -144,7 +148,11 @@
       ],
       "args": [
         {
-          "name": "_title",
+          "name": "_id",
+          "type": "bytes"
+        },
+        {
+          "name": "title",
           "type": "string"
         },
         {
@@ -178,6 +186,10 @@
           {
             "name": "owner",
             "type": "pubkey"
+          },
+          {
+            "name": "id",
+            "type": "bytes"
           },
           {
             "name": "title",

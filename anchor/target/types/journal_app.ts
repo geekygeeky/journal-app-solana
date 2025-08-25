@@ -33,7 +33,7 @@ export type JournalApp = {
             "seeds": [
               {
                 "kind": "arg",
-                "path": "title"
+                "path": "id"
               },
               {
                 "kind": "account",
@@ -53,6 +53,10 @@ export type JournalApp = {
         }
       ],
       "args": [
+        {
+          "name": "id",
+          "type": "bytes"
+        },
         {
           "name": "title",
           "type": "string"
@@ -83,7 +87,7 @@ export type JournalApp = {
             "seeds": [
               {
                 "kind": "arg",
-                "path": "title"
+                "path": "id"
               },
               {
                 "kind": "account",
@@ -104,8 +108,8 @@ export type JournalApp = {
       ],
       "args": [
         {
-          "name": "title",
-          "type": "string"
+          "name": "id",
+          "type": "bytes"
         }
       ]
     },
@@ -129,7 +133,7 @@ export type JournalApp = {
             "seeds": [
               {
                 "kind": "arg",
-                "path": "title"
+                "path": "id"
               },
               {
                 "kind": "account",
@@ -149,6 +153,10 @@ export type JournalApp = {
         }
       ],
       "args": [
+        {
+          "name": "id",
+          "type": "bytes"
+        },
         {
           "name": "title",
           "type": "string"
@@ -184,6 +192,10 @@ export type JournalApp = {
           {
             "name": "owner",
             "type": "pubkey"
+          },
+          {
+            "name": "id",
+            "type": "bytes"
           },
           {
             "name": "title",
