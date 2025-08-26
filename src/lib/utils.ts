@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function ellipsify(str = '', len = 4, delimiter = '..') {
+export function ellipsify(str = '', len = 4, delimiter = '...') {
   const strLen = str.length
   const limit = len * 2 + delimiter.length
 
@@ -64,5 +64,5 @@ export function bufferToUUID(buffer: Buffer): string {
     return '';
   };
   const str = buffer.toString('hex');
-  return `${str.slice(0, 8)}-${str.slice(8, 12)}-${str.slice(12, 16)}-${str.slice(16, 20)}-${str.slice(20)};`
+  return `${str.slice(0, 8)}-${str.slice(8, 12)}-${str.slice(12, 16)}-${str.slice(16, 20)}-${str.slice(20)}`
 }

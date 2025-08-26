@@ -19,11 +19,11 @@ export function AppHeader({ links = [] }: { links: { label: string; path: string
   return (
     <header className="relative z-50 px-4 py-2 bg-neutral-100 dark:bg-neutral-900 dark:text-neutral-400">
       <div className="mx-auto flex justify-between items-center">
-        <div className="flex items-baseline gap-4">
+        <div className="flex justify-between items-baseline gap-4">
           <Link className="text-xl hover:text-neutral-500 dark:hover:text-white text-cursive" href="/">
             <span>Journal.me</span>
           </Link>
-          <div className="hidden md:flex items-center">
+          <div className="ps-4 hidden md:flex items-center">
             <ul className="flex gap-4 flex-nowrap items-center">
               {links.map(({ label, path }) => (
                 <li key={path}>

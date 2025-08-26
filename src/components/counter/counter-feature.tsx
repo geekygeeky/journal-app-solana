@@ -13,15 +13,15 @@ export default function CounterFeature() {
   const { programId } = useCounterProgram()
 
   return publicKey ? (
-    <div>
+    <div className='flex md:flex-row items-baseline gap-12'>
       <AppHero
-        title="Counter"
+        title="Journal.me"
         subtitle={
-          'Create a new account by clicking the "Create" button. The state of a account is stored on-chain and can be manipulated by calling the program\'s methods (increment, decrement, set, and close).'
+          'A decentralised journal built on the Solana blockchain.'
         }
       >
         <p className="mb-6">
-          <ExplorerLink path={`account/${programId}`} label={ellipsify(programId.toString())} />
+          <ExplorerLink path={`account/${programId}`} label={ellipsify(programId.toString(), 6)} />
         </p>
         <CounterCreate />
       </AppHero>

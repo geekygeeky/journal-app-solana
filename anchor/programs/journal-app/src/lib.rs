@@ -5,7 +5,7 @@ use anchor_lang::prelude::*;
 
 declare_id!("5tDGXUeaGMTa549wnseY3uspE1UoUeTZcUpTvxE4D5ep");
 
-const ANCHOR_DEFAULT_SPACE: usize = 8;
+pub const ANCHOR_DISCRIMINATOR_SIZE: usize = 8;
 
 #[program]
 pub mod journal_app {
@@ -15,7 +15,7 @@ pub mod journal_app {
     pub fn create_journal_entry(ctx: Context<CreateEntry>, id: Vec<u8>, title: String, message: String) -> Result<()> {
         let journal_entry = &mut ctx.accounts.journal_entry;
         journal_entry.id = id; 
-        journal_entry.owner = *ctx.accounts.owner.key;
+        journal_entry.owner = ctx.accounts.owner.key();
         journal_entry.title = title;
         journal_entry.message = message;
 
@@ -41,10 +41,10 @@ pub mod journal_app {
 pub struct CreateEntry<'info> {
     #[account(
         init,
+        payer = owner,
+        space = ANCHOR_DISCRIMINATOR_SIZE + JournalEntryState::INIT_SPACE, 
         seeds = [&id, owner.key().as_ref()], 
         bump, 
-        space = ANCHOR_DEFAULT_SPACE + JournalEntryState::INIT_SPACE, 
-        payer = owner  
     )]
     pub journal_entry: Account<'info, JournalEntryState>,
 
@@ -60,11 +60,11 @@ pub struct UpdateEntry<'info> {
 
     #[account(
         mut,
+        realloc = ANCHOR_DISCRIMINATOR_SIZE + JournalEntryState::INIT_SPACE,
+        realloc::payer = owner,
+        realloc::zero = true,
         seeds = [&id, owner.key().as_ref()],
         bump,
-        realloc = 8 + JournalEntryState::INIT_SPACE,
-        realloc::payer = owner,
-        realloc::zero = true
     )]
     pub journal_entry: Account<'info, JournalEntryState>,
 
@@ -81,9 +81,9 @@ pub struct DeleteEntry<'info> {
 
     #[account(
         mut,
+        close = owner,
         seeds = [&id, owner.key().as_ref()],
         bump,
-        close = owner
     )]
     pub journal_entry: Account<'info, JournalEntryState>,
 

@@ -11,7 +11,7 @@ export function AppHero({
 }) {
   return (
     <div className="flex flex-row justify-center py-[16px] md:py-[64px]">
-      <div className="text-center">
+      <div className="text-left">
         <div className="max-w-2xl">
           {typeof title === 'string' ? <h1 className="text-5xl font-bold">{title}</h1> : title}
           {typeof subtitle === 'string' ? <p className="pt-4 md:py-6">{subtitle}</p> : subtitle}

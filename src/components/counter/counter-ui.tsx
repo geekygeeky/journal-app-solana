@@ -2,10 +2,10 @@
 
 import { Keypair, PublicKey } from '@solana/web3.js'
 import { useState } from 'react'
-import { stringify as uuidStringify, v4, parse } from 'uuid';
+import { stringify as uuidStringify, v4, parse } from 'uuid'
 import { ExplorerLink } from '../cluster/cluster-ui'
 import { useCounterProgram, useCounterProgramAccount } from './counter-data-access'
-import { ellipsify, generateUuidV4AsUint8Array, uuidToBuffer } from '@/lib/utils'
+import { bufferToUUID, ellipsify, generateUuidV4AsUint8Array, uuidToBuffer } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
 import { useWallet } from '@solana/wallet-adapter-react'
@@ -20,10 +20,12 @@ export function CounterCreate() {
 
   const isFormValid = title.trim() !== '' && message.trim() !== ''
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (owner && isFormValid) {
-      const id = uuidToBuffer(v4());
-      createEntry.mutateAsync({ id, title, message, owner })
+      const id = uuidToBuffer(v4())
+      await createEntry.mutateAsync({ id, title, message, owner })
+      setTitle('')
+      setMessage('')
     }
   }
 
@@ -31,28 +33,28 @@ export function CounterCreate() {
     return (
       <p>
         Connect your wallet
-        <Button onClick={() => { }}>Connect</Button>
+        <Button onClick={() => {}}>Connect</Button>
       </p>
     )
   }
 
   return (
-    <div>
+    <div className="flex flex-col gap-4">
       <input
         type="text"
         placeholder="Title"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        className="input input-bordered w-full max-w-xs"
+        className="p-2 w-full input input-bordered border border-white rounded"
       />
       <textarea
         placeholder="message"
         value={message}
         onChange={(e) => setMessage(e.target.value)}
-        className="textarea textarea-bordered w-full max-w-xs"
+        className="p-2 w-full textarea textarea-bordered border border-white rounded"
       />
       <Button onClick={handleSubmit} disabled={createEntry.isPending || !isFormValid}>
-        Connect
+        { createEntry.isPending ? 'Submitting...' : 'Submit on-chain' }
       </Button>
     </div>
   )
@@ -72,7 +74,7 @@ export function CounterList() {
     )
   }
   return (
-    <div className={'space-y-6'}>
+    <div className={'space-y-6 min-w-2xl'}>
       {accounts.isLoading ? (
         <span className="loading loading-spinner loading-lg"></span>
       ) : accounts.data?.length ? (
@@ -103,17 +105,17 @@ function CounterCard({ account }: { account: PublicKey }) {
 
   const handleUpdatee = () => {
     if (publicKey && isFormValid && accountQuery.data) {
-      const { id, title } = accountQuery.data;
+      const { id, title } = accountQuery.data
       updateEntry.mutateAsync({ id, title, message, owner: publicKey })
     }
   }
 
-  return accountQuery.isLoading ? (
+  return accountQuery.isLoading || !accountQuery.data ? (
     <span className="loading loading-spinner loading-lg"></span>
   ) : (
     <Card>
       <CardHeader>
-        <CardTitle>{accountQuery.data?.title}</CardTitle>
+        <CardTitle>{ellipsify(bufferToUUID(accountQuery.data.id))}</CardTitle>
         <CardDescription>
           Account: <ExplorerLink path={`account/${account}`} label={ellipsify(account.toString())} />
         </CardDescription>
@@ -128,12 +130,14 @@ function CounterCard({ account }: { account: PublicKey }) {
               deleteEntry.mutateAsync(id)
             }}
             disabled={deleteEntry.isPending}
-          >Delete</Button>
+          >
+            Delete
+          </Button>
         </CardAction>
       </CardHeader>
       <CardContent>
-        <div className="flex gap-4">
-          <p>{accountQuery.data?.id}</p>
+        <div className="flex flex-col gap-4">
+          <p>{accountQuery.data?.title}</p>
           <p>{accountQuery.data?.message}</p>
         </div>
       </CardContent>
