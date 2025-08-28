@@ -1,20 +1,21 @@
-# journal-app-solana
+# Journal dApp
 
-This is a Next.js app containing:
+A decentralized Journal application built on the Solana blockchain.
 
+## Tech Stack
 - Tailwind CSS setup for styling
 - Useful wallet UI elements setup using [@solana/web3.js](https://www.npmjs.com/package/@solana/web3.js)
-- A basic Counter Solana program written in Anchor
-- UI components for interacting with the Counter program
+- A Journal entry CRUD Solana program written in Anchor
+- UI components for interacting with the Journal program
 
 ## Getting Started
 
 ### Installation
 
-#### Download the template
+#### Clone the project
 
 ```shell
-pnpm create solana-dapp@latest -t gh:solana-foundation/templates/web3js/journal-app-solana
+git clone https://github.com/geekygeeky/journal-dapp-solana
 ```
 
 #### Install Dependencies
@@ -39,7 +40,7 @@ command with `pnpm`, eg: `pnpm anchor`.
 Running this command will create a new keypair in the `anchor/target/deploy` directory and save the address to the
 Anchor config file and update the `declare_id!` macro in the `./src/lib.rs` file of the program.
 
-You will manually need to update the constant in `anchor/lib/counter-exports.ts` to match the new program id.
+You will manually need to update the constant in `anchor/lib/journal-exports.ts` to match the new program id.
 
 ```shell
 pnpm anchor keys sync
